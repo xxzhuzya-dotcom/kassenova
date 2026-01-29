@@ -1,1 +1,311 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LUMIÈRE | Premium Electronics</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    colors: {
+                        luxury: {
+                            base: '#020617', // Slate 950
+                            surface: '#0f172a', // Slate 900
+                            gold: '#d4af37', // Metallic Gold
+                            muted: '#94a3b8', // Slate 400
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* Скрытие полосы прокрутки для эстетики */
+        body::-webkit-scrollbar {
+            width: 8px;
+        }
+        body::-webkit-scrollbar-track {
+            background: #020617;
+        }
+        body::-webkit-scrollbar-thumb {
+            background: #1e293b; 
+            border-radius: 4px;
+        }
+        .fade-in {
+            animation: fadeIn 0.8s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-luxury-base text-slate-100 font-sans antialiased selection:bg-luxury-gold selection:text-white">
+    
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // --- Данные (Mock Data) ---
+        const products = [
+            {
+                id: 1,
+                name: "Bang & Olufsen Beosound",
+                category: "Audio",
+                price: 3200,
+                image: "https://images.unsplash.com/photo-1545459720-aacfb5090129?q=80&w=800&auto=format&fit=crop",
+                tag: "Bestseller"
+            },
+            {
+                id: 2,
+                name: "Leica Q2 Monochrom",
+                category: "Photography",
+                price: 5995,
+                image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=800&auto=format&fit=crop",
+                tag: "Exclusive"
+            },
+            {
+                id: 3,
+                name: "SMEG Espresso Machine",
+                category: "Kitchen",
+                price: 850,
+                image: "https://images.unsplash.com/photo-1570588669466-9c4c52994e63?q=80&w=800&auto=format&fit=crop",
+                tag: "New"
+            },
+            {
+                id: 4,
+                name: "Dyson Purifier Cool",
+                category: "Climate",
+                price: 650,
+                image: "https://images.unsplash.com/photo-1585771724684-38269d6639fd?q=80&w=800&auto=format&fit=crop",
+                tag: null
+            },
+            {
+                id: 5,
+                name: "Apple Pro Display XDR",
+                category: "Computing",
+                price: 4999,
+                image: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?q=80&w=800&auto=format&fit=crop",
+                tag: "Professional"
+            },
+            {
+                id: 6,
+                name: "Devialet Phantom I",
+                category: "Audio",
+                price: 2990,
+                image: "https://images.unsplash.com/photo-1615865231940-205128362624?q=80&w=800&auto=format&fit=crop",
+                tag: "Hi-End"
+            }
+        ];
+
+        // --- Компоненты ---
+
+        // 1. Header Component
+        const Header = ({ cartCount }) => {
+            return (
+                <header className="fixed w-full z-50 bg-luxury-base/80 backdrop-blur-md border-b border-white/5 transition-all duration-300">
+                    <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+                        <div className="font-serif text-2xl tracking-widest font-semibold">
+                            LUMIÈRE<span className="text-luxury-gold">.</span>
+                        </div>
+                        
+                        <nav className="hidden md:flex space-x-8 text-sm tracking-wide text-luxury-muted">
+                            <a href="#" className="hover:text-white transition-colors">Коллекции</a>
+                            <a href="#" className="hover:text-white transition-colors">Бренды</a>
+                            <a href="#" className="hover:text-white transition-colors">О нас</a>
+                        </nav>
+
+                        <div className="flex items-center space-x-6">
+                            <button className="text-white hover:text-luxury-gold transition-colors">
+                                <i data-lucide="search" className="w-5 h-5"></i>
+                            </button>
+                            <button className="relative text-white hover:text-luxury-gold transition-colors">
+                                <i data-lucide="shopping-bag" className="w-5 h-5"></i>
+                                {cartCount > 0 && (
+                                    <span className="absolute -top-2 -right-2 bg-luxury-gold text-luxury-base text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                                        {cartCount}
+                                    </span>
+                                )}
+                            </button>
+                        </div>
+                    </div>
+                </header>
+            );
+        };
+
+        // 2. Hero Component
+        const Hero = () => {
+            return (
+                <section className="relative h-screen flex items-center justify-center overflow-hidden">
+                    <div className="absolute inset-0 z-0">
+                        <img 
+                            src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=2070&auto=format&fit=crop" 
+                            className="w-full h-full object-cover opacity-40 scale-105 hover:scale-100 transition-transform duration-[20s] ease-linear"
+                            alt="Hero Background"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-luxury-base via-luxury-base/50 to-transparent"></div>
+                    </div>
+
+                    <div className="relative z-10 text-center max-w-4xl px-6 fade-in mt-20">
+                        <span className="text-luxury-gold text-sm uppercase tracking-[0.3em] mb-4 block">Est. 2024</span>
+                        <h1 className="font-serif text-5xl md:text-7xl leading-tight mb-8">
+                            Технологии как <br/>
+                            <span className="italic text-luxury-muted">произведение искусства</span>
+                        </h1>
+                        <p className="text-lg text-slate-300 mb-10 max-w-xl mx-auto font-light leading-relaxed">
+                            Мы собрали коллекцию электроники, где безупречная инженерия встречается с эстетическим совершенством.
+                        </p>
+                        <button className="px-10 py-4 bg-white text-luxury-base hover:bg-luxury-gold hover:text-white transition-all duration-300 font-medium tracking-wide text-sm rounded-sm">
+                            Смотреть каталог
+                        </button>
+                    </div>
+                </section>
+            );
+        };
+
+        // 3. Product Card Component
+        const ProductCard = ({ product, onAdd }) => {
+            return (
+                <div className="group relative bg-luxury-surface/50 p-4 transition-all duration-500 hover:bg-luxury-surface hover:-translate-y-1">
+                    {product.tag && (
+                        <span className="absolute top-4 left-4 z-10 text-[10px] uppercase tracking-wider bg-luxury-gold text-luxury-base px-2 py-1 font-bold">
+                            {product.tag}
+                        </span>
+                    )}
+                    
+                    <div className="relative aspect-[4/5] mb-6 overflow-hidden bg-gray-800">
+                        <img 
+                            src={product.image} 
+                            alt={product.name} 
+                            className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700"
+                        />
+                        <button 
+                            onClick={() => onAdd()}
+                            className="absolute bottom-4 right-4 bg-white text-black p-3 translate-y-12 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 hover:bg-luxury-gold hover:text-white"
+                            aria-label="Add to cart"
+                        >
+                            <i data-lucide="plus" className="w-5 h-5"></i>
+                        </button>
+                    </div>
+
+                    <div className="space-y-2">
+                        <p className="text-xs text-luxury-muted uppercase tracking-wider">{product.category}</p>
+                        <h3 className="font-serif text-xl group-hover:text-luxury-gold transition-colors duration-300">{product.name}</h3>
+                        <p className="text-sm font-medium">${product.price.toLocaleString()}</p>
+                    </div>
+                </div>
+            );
+        };
+
+        // 4. Main App Component
+        const App = () => {
+            const [cartCount, setCartCount] = useState(0);
+
+            // Инициализация иконок Lucide после рендера
+            useEffect(() => {
+                if (window.lucide) {
+                    window.lucide.createIcons();
+                }
+            });
+
+            const addToCart = () => {
+                setCartCount(prev => prev + 1);
+                // Простая имитация уведомления (в реальном app нужен Toast)
+                console.log("Added to cart");
+            };
+
+            return (
+                <div className="min-h-screen flex flex-col">
+                    <Header cartCount={cartCount} />
+                    
+                    <main className="flex-grow">
+                        <Hero />
+                        
+                        <section className="max-w-7xl mx-auto px-6 py-24">
+                            <div className="flex justify-between items-end mb-16">
+                                <div>
+                                    <h2 className="font-serif text-3xl md:text-4xl mb-4">Избранное</h2>
+                                    <div className="h-1 w-20 bg-luxury-gold"></div>
+                                </div>
+                                <a href="#" className="hidden md:block text-sm text-luxury-gold hover:text-white transition-colors uppercase tracking-widest border-b border-transparent hover:border-luxury-gold pb-1">
+                                    Смотреть всё
+                                </a>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
+                                {products.map(product => (
+                                    <ProductCard key={product.id} product={product} onAdd={addToCart} />
+                                ))}
+                            </div>
+                            
+                            <div className="mt-16 text-center md:hidden">
+                                <a href="#" className="text-sm text-luxury-gold uppercase tracking-widest border-b border-luxury-gold pb-1">
+                                    Смотреть всё
+                                </a>
+                            </div>
+                        </section>
+                    </main>
+
+                    <footer className="bg-black py-16 border-t border-white/10">
+                        <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12 text-sm text-luxury-muted">
+                            <div className="md:col-span-2">
+                                <div className="font-serif text-2xl text-white tracking-widest mb-6">LUMIÈRE.</div>
+                                <p className="max-w-xs leading-relaxed">
+                                    Курируемая коллекция техники для тех, кто не ищет компромиссов между эстетикой и функциональностью.
+                                </p>
+                            </div>
+                            <div>
+                                <h4 className="text-white uppercase tracking-wider mb-6">Клиентам</h4>
+                                <ul className="space-y-4">
+                                    <li><a href="#" className="hover:text-luxury-gold transition-colors">Доставка</a></li>
+                                    <li><a href="#" className="hover:text-luxury-gold transition-colors">Возврат</a></li>
+                                    <li><a href="#" className="hover:text-luxury-gold transition-colors">Гарантия</a></li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 className="text-white uppercase tracking-wider mb-6">Контакты</h4>
+                                <ul className="space-y-4">
+                                    <li><a href="#" className="hover:text-luxury-gold transition-colors">concierge@lumiere.store</a></li>
+                                    <li>+7 (999) 000-00-00</li>
+                                    <li className="flex space-x-4 pt-2">
+                                        <i data-lucide="instagram" className="w-5 h-5 cursor-pointer hover:text-white"></i>
+                                        <i data-lucide="twitter" className="w-5 h-5 cursor-pointer hover:text-white"></i>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div className="max-w-7xl mx-auto px-6 mt-16 pt-8 border-t border-white/5 text-xs text-center md:text-left flex flex-col md:flex-row justify-between">
+                            <p>&copy; 2024 LUMIÈRE Store. All rights reserved.</p>
+                            <p className="mt-2 md:mt-0">Designed by AIRIS</p>
+                        </div>
+                    </footer>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
